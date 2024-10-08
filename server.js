@@ -13,9 +13,16 @@ const io = new Server(server, {
   },
 });
 
+let onlineUsers = [];
+
 io.on('connection', (socket) => {
-  socket.on('join', (payload) => {
-    console.log(payload)
+  socket.on('join', (userId) => {
+    if (!socket.rooms.has(userId)) {
+      socket.join(userId);
+      onlineUsers.push(userId);
+    }
+
+    console.log(onlineUsers);
   })
 });
 

@@ -7,10 +7,16 @@ const server = app.listen(port, () => {
   console.log(`Node JS + Socket app listening on port ${port}`);
 });
 
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: '*', // avoid CORS issue
+  },
+});
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  socket.on('join', (payload) => {
+    console.log(payload)
+  })
 });
 
 app.get('/', (req, res) => {

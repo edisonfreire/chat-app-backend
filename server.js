@@ -19,11 +19,19 @@ io.on('connection', (socket) => {
   socket.on('join', (userId) => {
     if (!socket.rooms.has(userId)) {
       socket.join(userId);
-      onlineUsers.push(userId);
+      if (!onlineUsers.includes(userId)) { // doesnt matter many times refresh
+        onlineUsers.push(userId);
+      }
+      
+      console.log('onlineUsers', onlineUsers);
     }
+  });
 
-    console.log(onlineUsers);
-  })
+  socket.on('logout', (userId) => {
+    socket.leave(userId);
+    onlineUsers = onlineUsers.filter((user) => user !== userId);
+    console.log('onlineUsers', onlineUsers);
+  });
 });
 
 app.get('/', (req, res) => {

@@ -22,8 +22,12 @@ io.on('connection', (socket) => {
       if (!onlineUsers.includes(userId)) { // doesnt matter many times refresh
         onlineUsers.push(userId);
       }
-      
+
       console.log('onlineUsers', onlineUsers);
+
+      onlineUsers.forEach((user) => {
+        io.to(user).emit('online-users-updated', onlineUsers);
+      });
     }
   });
 
@@ -31,6 +35,10 @@ io.on('connection', (socket) => {
     socket.leave(userId);
     onlineUsers = onlineUsers.filter((user) => user !== userId);
     console.log('onlineUsers', onlineUsers);
+
+    onlineUsers.forEach((user) => {
+      io.to(user).emit('online-users-updated', { onlineUsers });
+    });
   });
 });
 

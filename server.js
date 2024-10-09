@@ -31,13 +31,20 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('send-new-message', (message) => {
+    console.log(message);
+    message.chat.users.forEach((user) => {
+      io.to(user._id).emit('new-message-recieved', message);
+    });
+  });
+
   socket.on('logout', (userId) => {
     socket.leave(userId);
     onlineUsers = onlineUsers.filter((user) => user !== userId);
     console.log('onlineUsers', onlineUsers);
 
     onlineUsers.forEach((user) => {
-      io.to(user).emit('online-users-updated', { onlineUsers });
+      io.to(user).emit('online-users-updated', onlineUsers);
     });
   });
 });

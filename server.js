@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
   socket.on('join', (userId) => {
     if (!socket.rooms.has(userId)) {
       socket.join(userId);
-      if (!onlineUsers.includes(userId)) { // doesnt matter many times refresh
+      if (!onlineUsers.includes(userId)) { // doesnt matter how many times refresh
         onlineUsers.push(userId);
       }
 
@@ -31,7 +31,20 @@ io.on('connection', (socket) => {
 
   socket.on('send-new-message', (message) => {
     message.chat.users.forEach((user) => {
-      io.to(user._id).emit('new-message-recieved', message);
+      io.to(user._id).emit('new-message-received', message);
+    });
+  });
+
+  socket.on('read-all-messages', ({chatId, users, reacByUserId }) => {
+    users.forEach((user) => {
+      io.to(user).emit('user-read-all-chat-messages', { chatId, reacByUserId });
+    });
+  });
+
+  socket.on("typing", ({ chat, senderId, senderName }) => {
+    chat.users.forEach((user) => {
+      if (user._id !== senderId)
+        io.to(user._id).emit("typing", { chat, senderName });
     });
   });
 

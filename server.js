@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
   socket.on('join', (userId) => {
     if (!socket.rooms.has(userId)) {
       socket.join(userId);
-      if (!onlineUsers.includes(userId)) {
+      if (!onlineUsers.includes(userId)) { // doesnt matter how many times refresh
         onlineUsers.push(userId);
       }
 
@@ -35,31 +35,16 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('read-all-messages', ({ chatId, users, readByUserId }) => {
+  socket.on('read-all-messages', ({chatId, users, reacByUserId }) => {
     users.forEach((user) => {
-      io.to(user).emit('user-read-all-chat-messages', { chatId, readByUserId });
+      io.to(user).emit('user-read-all-chat-messages', { chatId, reacByUserId });
     });
   });
 
-  socket.on('typing', ({ chat, senderId, senderName }) => {
+  socket.on("typing", ({ chat, senderId, senderName }) => {
     chat.users.forEach((user) => {
-      if (user._id !== senderId) {
-        io.to(user._id).emit('typing', { chat, senderName });
-      }
-    });
-  });
-
-  socket.on('stop-typing', ({ chat, senderId }) => {
-    chat.users.forEach((user) => {
-      if (user._id !== senderId) {
-        io.to(user._id).emit('stop-typing', { chat });
-      }
-    });
-  });
-
-  socket.on('chat-created', (chat) => {
-    chat.users.forEach((user) => {
-      io.to(user._id).emit('chat-created', chat);
+      if (user._id !== senderId)
+        io.to(user._id).emit("typing", { chat, senderName });
     });
   });
 
@@ -76,3 +61,4 @@ io.on('connection', (socket) => {
 app.get('/', (req, res) => {
   return res.send('Chat App Node JS + Socket Server');
 });
+

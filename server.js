@@ -48,6 +48,12 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('chat-created', (chat) => {
+    chat.users.forEach((user) => {
+      io.to(user._id).emit('chat-created', chat);
+    });
+  });
+
   socket.on('logout', (userId) => {
     socket.leave(userId);
     onlineUsers = onlineUsers.filter((user) => user !== userId);
